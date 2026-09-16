@@ -1,14 +1,24 @@
+require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
-const routes = require('./routes');
 const PORT = process.env.PORT || 5000;
 
-// Middleware to parse JSON payloads safely
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
-// Pass all API queries through our modular router mapping
-app.use('/api', routes);
+// Mount the router folder
+app.use('/api', require('./routes/index'));
 
 app.listen(PORT, () => {
-    console.log(`Backend server engine listening safely on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

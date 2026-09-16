@@ -12,6 +12,8 @@ import {
   Lock as LockIcon,
 } from "lucide-react";
 
+import { loginUser } from "@/api/auth";
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -30,16 +32,33 @@ const Login = () => {
     }
   };
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setError(null);
+  setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/");
-    }, 1000);
-  };
+  try {
+    const data = await loginUser(email, password);
+
+    // 1. Save token and user details to localStorage
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    // Optional: Also set sessionStorage if rememberMe is false, 
+    // but ensure localStorage has it so AuthGuard passes.
+    if (!rememberMe) {
+      sessionStorage.setItem("token", data.token);
+    }
+
+    // 2. Navigate to the protected dashboard route (NOT "/")
+    navigate("/dashboard");
+  } catch (err: any) {
+    const message = err.response?.data?.error || "Login failed. Please try again.";
+    setError(message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <main className="min-h-[100dvh] bg-[#F4F6F8] text-slate-800">

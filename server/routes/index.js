@@ -1,14 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
-// Define quick fallback tests for frontend proxy confirmation
+// Import routes directly from the current folder (./)
+const authRoutes = require('./authRoutes');
+const permitRoutes = require('./permitRoutes');
+const serviceRoutes = require('./serviceRoutes');
+
+// Health Check
 router.get('/health', (req, res) => {
-    res.json({ status: "Backend api system up and fully operational" });
+  res.json({ status: "Backend api system up and fully operational" });
 });
 
-// Future endpoint mapping slots:
-// router.use('/auth', require('./authRoutes'));
-// router.use('/permits', require('./permitRoutes'));
-// router.use('/services', require('./serviceRoutes'));
+// Route Mounting
+router.use('/auth', authRoutes);
+router.use('/permits', permitRoutes);
+router.use('/services', serviceRoutes);
 
 module.exports = router;
