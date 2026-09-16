@@ -4,12 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "server": "npm run dev --prefix server",
+    "client": "vite",
+    "dev": "concurrently --names \"BACKEND,FRONTEND\" --prefix-colors \"yellow,cyan\" \"npm run server\" \"npm run client\"",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dyad-sh/react-vite-component-tagger": "^0.9.0",
     "lucide-react": "^1.34.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -17,13 +20,18 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "@types/node": "^24.13.3",
+    "@types/node": "^24.13.5",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "@vitejs/plugin-react": "^6.1.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitejs/plugin-react-swc": "^4.3.3",
+    "concurrently": "^10.0.5",
     "oxlint": "^1.79.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
+  },
+  "allowScripts": {
+    "@swc/core@1.16.2": true
   }
 }
