@@ -1,15 +1,22 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 
 export default function AuthGuard() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   const location = useLocation()
 
+  // Prevent early redirection while AuthContext is initializing/restoring user state
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground animate-pulse">Loading...</div>
+      </div>
+    )
+  }
+
   if (!isAuthenticated) {
-    // Redirect unauthenticated users to login, saving current location
     return <Navigate to="/" state={{ from: location }} replace />
   }
 
-  // Render child routes defined inside <Route element={<AuthGuard />}>
   return <Outlet />
 }

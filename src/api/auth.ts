@@ -30,3 +30,8 @@ export const resendOTPUser = async (email: string) => {
   const response = await api.post("/auth/resend-otp", { email });
   return response.data;
 };
+
+export const getHealthServices = async () => {
+  const response = await api.get("/services/health-services");
+  return response.data;
+};

@@ -6,6 +6,9 @@ const { sendOtpEmail } = require('../utils/mailer');
 // Helper to normalize email inputs
 const normalizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase() : '');
 
+// Valid 60-character bcrypt hash to prevent timing attacks safely
+const DUMMY_HASH = '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy';
+
 // -----------------------------------------------------------------------------
 // 1. SIGNUP
 // -----------------------------------------------------------------------------
@@ -169,16 +172,15 @@ const login = async (req, res) => {
   }
 
   try {
+    // Strictly selecting columns present in your database schema
     const userResult = await pool.query(
-      `SELECT id, email, name, passwordhash, verified, avatar, active, role, department, position, two_factor_enabled 
+      `SELECT id, email, name, passwordhash, verified, avatar, active, role, department, position 
        FROM users WHERE LOWER(email) = $1 LIMIT 1`,
       [email]
     );
     const user = userResult.rows[0];
 
-    // Dummy hash prevents timing side-channel attacks if user email doesn't exist
-    const dummyHash = '$2b$10$e868d4vJ.W.K8q43Zf879.4r56H0a09b.58Yh37vC9u8sN6x249aK';
-    const userHash = user?.passwordhash || dummyHash;
+    const userHash = user?.passwordhash || DUMMY_HASH;
     const isPasswordValid = await bcrypt.compare(password, userHash);
 
     if (!user || !isPasswordValid) {
@@ -212,7 +214,6 @@ const login = async (req, res) => {
         role: user.role,
         department: user.department || null,
         position: user.position || null,
-        twoFactorEnabled: user.two_factor_enabled || false,
       },
     });
   } catch (err) {
